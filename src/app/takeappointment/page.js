@@ -4,50 +4,58 @@ import api from "../../../lib/api"
 import Navbar from "../components/navbar"
 import styles from "./styles.module.css"
 
-function NewAppointment() {
+function TakeAppointment() {
     const [user, setUser] = useState(null)
     const [doctors, setDoctors] = useState([]);
     const [selectedDoctor, setSelectedDoctor] = useState("");
-    const [date, setDate] = useState("");   // yyyy‑MM‑dd
-    const [time, setTime] = useState("");   // HH:mm
-    const [available, setAvailable] = useState(null); // null | true | false
+    const [date, setDate] = useState("");
+    const [time, setTime] = useState("");
+    const [available, setAvailable] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
 
     useEffect(() => {
-        api.get("/user")
-            .then((res) => {
-                setUser(res.data);
-            })
-            .catch((err) => {
-                console.error("Kullanıcı alınamadı:", err);
-            });
+        async function getUser() {
+            await api.get("/user")
+            .then((res) => setUser(res.data))
+            .catch((err) => console.error("Kullanıcı alınamadı:", err));
+        }        
+
+        getUser()    
     }, [])
 
     useEffect(() => {
-        api.get("/doctors")
+        async function getDoctors(){
+            await api.get("/doctors")
             .then((res) => setDoctors(res.data))
             .catch((err) => console.error("Doktorlar alınamadı:", err))
             .finally(() => setLoading(false));
+        }        
+
+        getDoctors()
     }, []);
 
     useEffect(() => {
-        if (!selectedDoctor || !date || !time) {
-            setAvailable(null);
-            return;
-        }
+        async function checkAvailability(){
+            if (!selectedDoctor || !date || !time) {
+                setAvailable(null);
+                return;
+            }
 
-        const dateTime = `${date}T${time}:00`;
+            const dateTime = `${date}T${time}:00`;
 
-        api.get("/appointments/availability", {
-            params: { doctorId: selectedDoctor, dateTime }
-        })
-            .then((res) => setAvailable(res.data.available)) // { available: true/false }
+            await api.get("/appointments/availability", {
+                params: { doctorId: selectedDoctor, dateTime }
+            })
+            .then((res) => setAvailable(res.data.available))
             .catch((err) => {
                 console.error("Uygunluk kontrolü hatası:", err);
                 setAvailable(false);
             });
+        }        
+        
+        checkAvailability()
     }, [selectedDoctor, date, time]);
 
     async function handleSubmit(e) {
@@ -58,11 +66,10 @@ function NewAppointment() {
         try {
             await api.post("/appointments", {
                 doctorId: selectedDoctor,
-                dateTime: `${date}T${time}:00`,
-                notes: ""
+                time: `${date}T${time}:00`
             });
             setMessage("Randevunuz oluşturuldu!");
-            // Formu sıfırlayabilirsiniz
+
             setSelectedDoctor("");
             setDate("");
             setTime("");
@@ -77,10 +84,9 @@ function NewAppointment() {
 
     if (loading) return <p className={styles.loading}>Yükleniyor...</p>;
 
-
     return (
         <div>
-            <Navbar user={user && user.username} />
+            <Navbar user={user && user.username} role={user && user.role}/>
             <div className={styles.mainContent}>
                 <div className={styles.container}>
                     <h2 className={styles.heading}>Randevu Al</h2>
@@ -109,7 +115,6 @@ function NewAppointment() {
                             />
                         </label>
 
-                        {/* Saat */}
                         <label className={styles.label}>
                             Saat
                             <input
@@ -138,4 +143,4 @@ function NewAppointment() {
     )
 }
 
-export default NewAppointment
+export default TakeAppointment

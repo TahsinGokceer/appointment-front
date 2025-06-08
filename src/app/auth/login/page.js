@@ -20,9 +20,11 @@ export default function Login() {
         e.preventDefault()
         try {
             const response = await api.post("/auth/login", { email, password })
-            console.log(response.data);
-            
+            console.log(response.data.user);
+            console.log("11111111111");            
             router.push("/dashboard")
+            console.log("22222222222");
+            
             
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {

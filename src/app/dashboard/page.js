@@ -8,18 +8,23 @@ function Dashboard() {
     const [user, setUser] = useState(null)
 
     useEffect(() => {
-        api.get("/user")
-        .then((res) => {            
-            setUser(res.data);
-        })
-        .catch((err) => {
-            console.error("Kullanıcı alınamadı:", err);
-        });
+       async function getUser(){
+
+            await api.get("/user")
+            .then((res) => {
+                setUser(res.data);
+            })
+            .catch((err) => {
+                console.error("Kullanıcı alınamadı:", err);
+            });
+        }        
+
+        getUser()
     }, [])
 
     return (
         <div>
-            <Navbar user={user && user.username}/>
+            <Navbar user={user && user.username} role={user && user.role}/>
             <div className={styles.mainContent}>
                 <h1>Hoş Geldiniz</h1>
                 <p>Burası ana içerik alanı.</p>

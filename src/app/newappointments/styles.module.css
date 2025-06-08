@@ -22,8 +22,8 @@
 }
 
 .small_btn{
+  /* width: 10%; */
   padding: 12px;
-  /* margin-top: 1rem; */
   background: #2a6bd0;
   color: #fff;
   border: none;
@@ -39,7 +39,7 @@
 }
 
 .header{
-  margin: 2rem 0;
+  margin-bottom: 2rem ;
 }
 
 .li{
@@ -53,4 +53,8 @@
 
 .p{
   margin-bottom: 1rem;
+}
+
+.textarea {
+  padding: 10px;
 }
